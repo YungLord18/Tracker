@@ -1,6 +1,6 @@
 import UIKit
 
-class TrackerViewController: UIViewController, UISearchBarDelegate {
+class TrackerViewController: UIViewController, UISearchBarDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
     
     // MARK: - Public Properties
     
@@ -10,6 +10,8 @@ class TrackerViewController: UIViewController, UISearchBarDelegate {
         formatter.dateFormat = "dd.MM.yy"
         return formatter
     }()
+    var categories: [TrackerCategory] = []
+    var completedTrackers: [TrackerRecord] = []
     
     // MARK: - Private Properties
     
@@ -60,6 +62,20 @@ class TrackerViewController: UIViewController, UISearchBarDelegate {
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.textAlignment = .center
         return label
+    }()
+    
+    private lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .ypWhite
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
+        collectionView.register(TrackerSectionHeader.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: "TrackerSectionHeader")
+        return collectionView
     }()
     
     
@@ -113,13 +129,26 @@ class TrackerViewController: UIViewController, UISearchBarDelegate {
         navigationItem.rightBarButtonItems = [datePicker]
     }
     
+    //MARK: - Public Methods
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        <#code#>
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        <#code#>
+    }
+    
     // MARK: - Actions
     
     @objc private func addTracker() {}
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         selectedDate = sender.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yy"
+        let formattedDate = dateFormatter.string(from: selectedDate)
+        print("Выбранная дата: \(formattedDate)")
     }
     
 }
-

@@ -6,6 +6,8 @@ final class MainTabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupAppearance()
+        setupViewControllers()
     }
     
     // MARK: - Private Methods
