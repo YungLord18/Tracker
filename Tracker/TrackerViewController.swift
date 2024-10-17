@@ -1,6 +1,6 @@
 import UIKit
 
-class TrackerViewController: UIViewController, UISearchBarDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
+class TrackerViewController: UIViewController, UISearchBarDelegate, UICollectionViewDelegate {
     
     // MARK: - Public Properties
     
@@ -69,7 +69,7 @@ class TrackerViewController: UIViewController, UISearchBarDelegate, UICollection
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .ypWhite
-        collectionView.dataSource = self
+        //collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collectionView.register(TrackerSectionHeader.self,
@@ -77,7 +77,6 @@ class TrackerViewController: UIViewController, UISearchBarDelegate, UICollection
                                 withReuseIdentifier: "TrackerSectionHeader")
         return collectionView
     }()
-    
     
     
     // MARK: - Lifecycle
@@ -94,7 +93,7 @@ class TrackerViewController: UIViewController, UISearchBarDelegate, UICollection
     // MARK: - Private Methods
     
     private func setupUI() {
-        [titleLabel, searchBar, errorImageView, trackingLabel].forEach {
+        [titleLabel, searchBar, errorImageView, trackingLabel, collectionView].forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -121,6 +120,11 @@ class TrackerViewController: UIViewController, UISearchBarDelegate, UICollection
             trackingLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             trackingLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             trackingLabel.heightAnchor.constraint(equalToConstant: 18),
+            
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            collectionView.bottomAnchor.constraint(equalTo: view.topAnchor, constant: -16),
         ])
     }
     
@@ -131,17 +135,14 @@ class TrackerViewController: UIViewController, UISearchBarDelegate, UICollection
     
     //MARK: - Public Methods
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        <#code#>
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        <#code#>
-    }
     
     // MARK: - Actions
     
-    @objc private func addTracker() {}
+    @objc private func addTracker() {
+        let trackerTypeSelectionVC = TrackerTypeSelectionViewController()
+        trackerTypeSelectionVC.delegate = self
+        present(trackerTypeSelectionVC, animated: true, completion: nil)
+    }
     
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         selectedDate = sender.date
