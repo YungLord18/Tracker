@@ -98,7 +98,7 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
     private lazy var scheduleButton: UIButton = {
         let button = createRoundedButton(
             title: "Расписание",
-            action: #selector(categoriesButtonTapped),
+            action: #selector(scheduleButtonTapped),
             corners: [.topLeft, .topRight],
             radius: 16)
         button.titleLabel?.numberOfLines = 0
@@ -387,15 +387,49 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
     }
     
     private func updateCategoriesButtonTitle() {
-        
-    }
-    
-    private func updateScheduleButtonTitle(){
-        
+        let titleText = NSMutableAttributedString(string: "Категория\n", attributes: [
+                .font: UIFont.systemFont(ofSize: 17, weight: .regular),
+                .foregroundColor: UIColor.ypBlack])
+        if let categoryText = selectedCategory {
+            let categoryAttributedText = NSAttributedString(string: categoryText, attributes: [
+                .font: UIFont.systemFont(ofSize: 17, weight: .regular),
+                .foregroundColor: UIColor.ypGray
+            ])
+            titleText.append(categoryAttributedText)
+        }
+        categoriesButton.setAttributedTitle(titleText, for: .normal)
     }
     
     private func updatePlainCategoriesButtonTitle(categoryTitle: String) {
         categoriesButton.setTitle(categoryTitle, for: .normal)
+    }
+    
+    private func updateScheduleButtonTitle() {
+        let weekDayShortNames: [WeekDay: String] = [
+            .monday: "Пн",
+            .tuesday: "Вт",
+            .wednesday: "Ср",
+            .thursday: "Чт",
+            .friday: "Пт",
+            .saturday: "Сб",
+            .sunday: "Вс"
+        ]
+        let titleText = NSMutableAttributedString(string: "Расписание\n", attributes: [
+                .font: UIFont.systemFont(ofSize: 17, weight: .regular),
+                .foregroundColor: UIColor.ypBlack])
+        var daysText: String
+        if selectedDays.count == WeekDay.allCases.count {
+            daysText = "Каждый день"
+        } else {
+            let shortNames = selectedDays.compactMap { weekDayShortNames[$0] }
+            daysText = shortNames.joined(separator: ", ")
+        }
+        let daysAttributedText = NSAttributedString(string: daysText, attributes: [
+            .font: UIFont.systemFont(ofSize: 17, weight: .regular),
+            .foregroundColor: UIColor.ypGray
+        ])
+        titleText.append(daysAttributedText)
+        scheduleButton.setAttributedTitle(titleText, for: .normal)
     }
     
     private func updateButtonStates() {
@@ -498,6 +532,35 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
     }
     
     @objc private func saveButtonTapped() {
-        
+        guard let name = nameTextField.text, !name.isEmpty else { return }
+        guard let selectedCategory = selectedCategory else { return }
+        guard let selectedEmoji = selectedEmoji else { return }
+        guard let selectedColor = selectedColor else { return }
+        var schedule = selectedDays.map { $0.rawValue }
+        if trackerType == .irregularEvent {
+            schedule.append("irregularEvent")
+        } else {
+            schedule.append("habit")
+        }
+        if let trackerToEdit = trackerToEdit {
+            let updatedTracker = Tracker(
+                id: trackerToEdit.id,
+                name: name,
+                color: selectedColor,
+                emoji: selectedEmoji,
+                schedule: schedule)
+            dataManager.updateTracker(updatedTracker, inCategory: selectedCategory)
+            delegate?.didCreateTracker(updatedTracker, inCategory: selectedCategory)
+        } else {
+            let newTracker = Tracker(
+                id: UUID(),
+                name: name,
+                color: selectedColor,
+                emoji: selectedEmoji,
+                schedule: schedule)
+            dataManager.addNewTracker(to: selectedCategory, tracker: newTracker)
+            delegate?.didCreateTracker(newTracker, inCategory: selectedCategory)
+        }
+        dismiss(animated: true, completion: nil)
     }
 }
