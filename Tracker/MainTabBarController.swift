@@ -10,6 +10,11 @@ final class MainTabBarController: UITabBarController {
         setupViewControllers()
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        setupAppearance()
+    }
+    
     // MARK: - Private Methods
     
     private func setupViewControllers() {

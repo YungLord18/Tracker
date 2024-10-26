@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		19C9965F2CB683A400A1A9C4 /* Exceptions for "Tracker" folder in "Tracker" target */ = {
+		19E7D61E2CCD3E0700533A14 /* Exceptions for "Tracker" folder in "Tracker" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		19C9964F2CB683A200A1A9C4 /* Tracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				19C9965F2CB683A400A1A9C4 /* Exceptions for "Tracker" folder in "Tracker" target */,
+				19E7D61E2CCD3E0700533A14 /* Exceptions for "Tracker" folder in "Tracker" target */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
