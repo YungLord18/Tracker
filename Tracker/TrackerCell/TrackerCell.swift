@@ -236,8 +236,8 @@ extension TrackerCell: UIContextMenuInteractionDelegate {
             guard let tracker = tracker else { return nil }
             let isPinned = dataManager?.isTrackerPinned(tracker) ?? false
             let pinActionTitle = isPinned ?
-            NSLocalizedString("Unpin", comment: "Открепить") :
-            NSLocalizedString("Pin", comment: "Закрепить")
+            NSLocalizedString("Открепить", comment: "") :
+            NSLocalizedString("Закрепить", comment: "")
             let pinAction = UIAction(title: pinActionTitle, image: UIImage(systemName: "pin")) { [weak self] _ in
                 guard let self = self else { return }
                 if isPinned {
@@ -248,12 +248,12 @@ extension TrackerCell: UIContextMenuInteractionDelegate {
                 self.delegate?.trackerCellDidToggleCompletion(self, for: tracker)
             }
             let editAction = UIAction(
-                title: NSLocalizedString("Edit", comment: "Редактировать")) { [weak self] _ in
+                title: NSLocalizedString("Редактировать", comment: "")) { [weak self] _ in
                     guard let self = self else { return }
                     self.delegate?.trackerCellDidRequestEdit(self, for: tracker)
                 }
             let deleteAction = UIAction(
-                title: NSLocalizedString("Delete", comment: "Удалить"),
+                title: NSLocalizedString("Удалить", comment: ""),
                 attributes: .destructive
             ) { [weak self] _ in
                 guard let self = self else { return }
