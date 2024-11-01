@@ -118,7 +118,7 @@ final class TrackerCell: UICollectionViewCell {
         let uniqueDates = Set(completedTrackers.map { $0.date })
         let countDays = uniqueDates.count
         let localizedDays = String.localizedStringWithFormat(
-            NSLocalizedString("days_count", comment: ""),
+            NSLocalizedString("0", comment: ""),
             countDays)
         countLabel.text = localizedDays
         let configuration = UIImage.SymbolConfiguration(pointSize: 10, weight: .bold)
