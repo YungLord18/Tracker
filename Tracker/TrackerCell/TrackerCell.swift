@@ -210,7 +210,7 @@ final class TrackerCell: UICollectionViewCell {
         guard let tracker = tracker else { return }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yy"
-        guard let selectedDate = dateFormatter.date(from: date), selectedDate <= Date() else {
+        guard let currentDate = dateFormatter.date(from: date), currentDate <= Date() else {
             return
         }
         if isCompletedForToday() {

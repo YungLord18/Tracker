@@ -18,7 +18,7 @@ final class MainTabBarController: UITabBarController {
     // MARK: - Private Methods
     
     private func setupViewControllers() {
-        let trackersViewController = UINavigationController(rootViewController: TrackerViewController())
+        let trackersViewController = UINavigationController(rootViewController: TrackersViewController())
         trackersViewController.tabBarItem = UITabBarItem(title: "Трекеры",
                                                          image: UIImage(named: "Tracker"),
                                                          selectedImage: nil)

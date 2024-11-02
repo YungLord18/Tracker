@@ -2,7 +2,7 @@ import UIKit
 
 // MARK: - TrackerTypeSelectionDelegate
 
-extension TrackerViewController: TrackerTypeSelectionDelegate {
+extension TrackersViewController: TrackerTypeSelectionDelegate {
     func didSelectTrackerType(_ type: TrackerType) {
         dismiss(animated: true) {
             let createTrackerVC = TrackerCreationViewController()
@@ -88,7 +88,7 @@ extension TrackerCreationViewController: UICollectionViewDataSource, UICollectio
 
 // MARK: - TrackerCreationDelegate
 
-extension TrackerViewController: TrackerCreationDelegate {
+extension TrackersViewController: TrackerCreationDelegate {
     func didCreateTracker(
         _ tracker: Tracker,
         inCategory category: String
@@ -100,7 +100,7 @@ extension TrackerViewController: TrackerCreationDelegate {
 
 // MARK: - UICollectionViewDataSource
 
-extension TrackerViewController: UICollectionViewDataSource {
+extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return visibleCategories.count
     }
@@ -110,7 +110,7 @@ extension TrackerViewController: UICollectionViewDataSource {
         numberOfItemsInSection section: Int) -> Int {
             let category = visibleCategories[section]
             let trackers = category.trackers.filter {
-                dataManager.shouldDisplayTracker($0, forDate: selectedDate, dateFormatter: dateFormatter)
+                dataManager.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
             }
             return trackers.count
         }
@@ -125,7 +125,7 @@ extension TrackerViewController: UICollectionViewDataSource {
             }
             let category = visibleCategories[indexPath.section]
             let trackers = category.trackers.filter {
-                dataManager.shouldDisplayTracker($0, forDate: selectedDate, dateFormatter: dateFormatter)
+                dataManager.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
             }
             let tracker = trackers[indexPath.item]
             let completedTrackers = dataManager.completedTrackers.filter { $0.trackerID == tracker.id }
@@ -133,7 +133,7 @@ extension TrackerViewController: UICollectionViewDataSource {
                 with: tracker,
                 completedTrackers: completedTrackers,
                 dataManager: dataManager,
-                date: dateFormatter.string(from: selectedDate))
+                date: dateFormatter.string(from: currentDate))
             cell.delegate = self
             return cell
         }
@@ -141,7 +141,7 @@ extension TrackerViewController: UICollectionViewDataSource {
 
 // MARK: - UICollectionViewDelegate
 
-extension TrackerViewController: UICollectionViewDelegate {
+extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(
         _ collectionView: UICollectionView,
         viewForSupplementaryElementOfKind kind: String,
@@ -164,7 +164,7 @@ extension TrackerViewController: UICollectionViewDelegate {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
-extension TrackerViewController: UICollectionViewDelegateFlowLayout {
+extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
@@ -183,7 +183,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - UISearchBarDelegate
 
-extension TrackerViewController: UISearchBarDelegate {
+extension TrackersViewController: UISearchBarDelegate {
     func searchBar(
         _ searchBar: UISearchBar,
         textDidChange searchText: String
@@ -205,7 +205,7 @@ extension TrackerViewController: UISearchBarDelegate {
 
 // MARK: - TrackerCellDelegate
 
-extension TrackerViewController: TrackerCellDelegate {
+extension TrackersViewController: TrackerCellDelegate {
     func trackerCellDidToggleCompletion(_ cell: TrackerCell, for tracker: Tracker) {
         updateTrackersView()
     }
@@ -219,7 +219,7 @@ extension TrackerViewController: TrackerCellDelegate {
     }
 }
 
-extension TrackerViewController: UITextFieldDelegate {
+extension TrackersViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
