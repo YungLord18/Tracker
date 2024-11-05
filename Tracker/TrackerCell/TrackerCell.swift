@@ -117,9 +117,7 @@ final class TrackerCell: UICollectionViewCell {
         updatePinVisibility()
         let uniqueDates = Set(completedTrackers.map { $0.date })
         let countDays = uniqueDates.count
-        let localizedDays = String.localizedStringWithFormat(
-            NSLocalizedString("0", comment: ""),
-            countDays)
+        let localizedDays = String(format: "%d", countDays)
         countLabel.text = localizedDays
         let configuration = UIImage.SymbolConfiguration(pointSize: 10, weight: .bold)
         let iconName = isCompletedForToday() ? "checkmark" : "plus"
@@ -187,6 +185,16 @@ final class TrackerCell: UICollectionViewCell {
         ])
     }
     
+    private func addCompletedTracker(_ trackerRecord: TrackerRecord) {
+        completedTrackers.append(trackerRecord)
+    }
+    
+    private func removeCompletedTracker(_ trackerRecord: TrackerRecord) {
+        if let index = completedTrackers.firstIndex(where: { $0.trackerID == trackerRecord.trackerID }) {
+            completedTrackers.remove(at: index)
+        }
+    }
+    
     private func updateCompletionButtonSaturation(forCompletedState isCompleted: Bool) {
         if isCompleted {
             completionButton.backgroundColor = tracker?.color.withAlphaComponent(0.3)
@@ -217,6 +225,8 @@ final class TrackerCell: UICollectionViewCell {
             dataManager?.unmarkTrackerAsCompleted(trackerId: tracker.id, date: date)
         } else {
             dataManager?.markTrackerAsCompleted(trackerId: tracker.id, date: date)
+            let trackerRecord = TrackerRecord(trackerID: tracker.id, date: date)
+                    addCompletedTracker(trackerRecord)
         }
         updateCompletionButtonSaturation(forCompletedState: !isCompletedForToday())
         delegate?.trackerCellDidToggleCompletion(self, for: tracker)
