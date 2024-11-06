@@ -57,9 +57,7 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
     
     private lazy var completedDaysLabel: UILabel = {
         let label = UILabel()
-        let localizedDays = String.localizedStringWithFormat(
-            NSLocalizedString("0", comment: ""),
-            recordDay)
+        let localizedDays = String(format: "%d", recordDay)
         label.text = localizedDays
         label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         label.textColor = .ypBlack
