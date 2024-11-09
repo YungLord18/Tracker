@@ -35,7 +35,17 @@ final class TrackerCell: UICollectionViewCell {
     
     private lazy var emojiLabel: UILabel = {
         let label = UILabel()
+        label.layer.zPosition = 1
         return label
+    }()
+    
+    private lazy var emojiCoverView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white.withAlphaComponent(0.3)
+        view.layer.cornerRadius = 14
+        view.clipsToBounds = true
+        view.layer.zPosition = 0
+        return view
     }()
     
     private lazy var nameLabel: UILabel = {
@@ -115,10 +125,7 @@ final class TrackerCell: UICollectionViewCell {
         nameLabel.text = tracker.name
         updateCompletionButtonSaturation(forCompletedState: isCompletedForToday())
         updatePinVisibility()
-        let uniqueDates = Set(completedTrackers.map { $0.date })
-        let countDays = uniqueDates.count
-        let localizedDays = String(format: "%d", countDays)
-        countLabel.text = localizedDays
+        cofigureCountLabel()
         let configuration = UIImage.SymbolConfiguration(pointSize: 10, weight: .bold)
         let iconName = isCompletedForToday() ? "checkmark" : "plus"
         let iconImage = UIImage(systemName: iconName, withConfiguration: configuration)
@@ -137,7 +144,7 @@ final class TrackerCell: UICollectionViewCell {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
-        [emojiLabel, nameLabel, pinView].forEach {
+        [emojiLabel, nameLabel, pinView, emojiCoverView].forEach {
             cardView.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -159,6 +166,11 @@ final class TrackerCell: UICollectionViewCell {
             emojiLabel.heightAnchor.constraint(equalToConstant: 24),
             emojiLabel.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 12),
             emojiLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 12),
+            
+            emojiCoverView.topAnchor.constraint(equalTo: emojiLabel.topAnchor, constant: -2),
+            emojiCoverView.leadingAnchor.constraint(equalTo: emojiLabel.leadingAnchor, constant: -2),
+            emojiCoverView.trailingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 2),
+            emojiCoverView.bottomAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 2),
             
             nameLabel.heightAnchor.constraint(equalToConstant: 34),
             nameLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 12),
@@ -183,6 +195,26 @@ final class TrackerCell: UICollectionViewCell {
             pinView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 18),
             pinView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12),
         ])
+    }
+    
+    private func cofigureCountLabel() {
+        let uniqueDates = Set(completedTrackers.map { $0.date })
+        let countDays = uniqueDates.count
+        var localizedDays = String(format: "%d", countDays)
+        
+        switch countDays % 10 {
+            case 1 where countDays % 100 != 11:
+                localizedDays += " день"
+            case 2, 3, 4:
+                if (12...14).contains(countDays % 100) {
+                    localizedDays += " дня"
+                } else {
+                    localizedDays += " дней"
+                }
+            default:
+                localizedDays += " дней"
+            }
+        countLabel.text = localizedDays
     }
     
     private func addCompletedTracker(_ trackerRecord: TrackerRecord) {
