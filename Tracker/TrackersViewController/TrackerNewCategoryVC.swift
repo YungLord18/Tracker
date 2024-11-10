@@ -40,6 +40,7 @@ final class TrackerNewCategoryVC: UIViewController {
         button.layer.cornerRadius = 16
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .ypGray
+        button.setTitleColor(.ypWhite, for: .normal)
         button.isEnabled = false
         button.heightAnchor.constraint(equalToConstant: 60).isActive = true
         button.addTarget(
