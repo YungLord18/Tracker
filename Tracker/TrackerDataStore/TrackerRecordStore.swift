@@ -15,6 +15,7 @@ final class TrackerRecordStore {
     //MARK: - Private Properties
     
     private let context = TrackerDataManager.shared.context
+    private var completedTrackers: [TrackerRecord] = []
     
     //MARK: - Public Methods
     
@@ -23,6 +24,9 @@ final class TrackerRecordStore {
         recordObject.date = date
         recordObject.tracker = tracker
         saveContext()
+        
+        let newTrackerRecord = TrackerRecord(coreData: recordObject)
+        completedTrackers.append(newTrackerRecord)
     }
     
     func fetchRecords(for tracker: TrackerCoreData) -> [TrackerRecordCoreData] {
@@ -39,6 +43,10 @@ final class TrackerRecordStore {
     func deleteRecord(_ record: TrackerRecordCoreData) {
         context.delete(record)
         saveContext()
+        
+        if let index = completedTrackers.firstIndex(where: { $0.trackerID == record.tracker?.id }) {
+            completedTrackers.remove(at: index)
+        }
     }
     
     //MARK: - Private Methods

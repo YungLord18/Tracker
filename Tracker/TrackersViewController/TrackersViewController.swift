@@ -11,6 +11,7 @@ final class TrackersViewController: UIViewController {
         formatter.dateFormat = "dd.MM.yy"
         return formatter
     }()
+    
     var categories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
     
