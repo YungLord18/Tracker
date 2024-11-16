@@ -19,35 +19,68 @@ final class TrackerRecordStore {
     
     //MARK: - Public Methods
     
-    func addRecord(date: String, tracker: TrackerCoreData) {
+//    func addRecord(date: String, tracker: TrackerCoreData) {
+//        let recordObject = TrackerRecordCoreData(context: context)
+//        recordObject.date = date
+//        recordObject.tracker = tracker
+//        saveContext()
+//        
+//        let newTrackerRecord = TrackerRecord(coreData: recordObject)
+//        completedTrackers.append(newTrackerRecord)
+//    }
+    
+    func addRecord(_ record: TrackerRecord) {
         let recordObject = TrackerRecordCoreData(context: context)
-        recordObject.date = date
-        recordObject.tracker = tracker
+        recordObject.date = record.date
+        recordObject.tracker = TrackerCoreData(context: context)
+        recordObject.tracker?.id = record.trackerID
         saveContext()
-        
-        let newTrackerRecord = TrackerRecord(coreData: recordObject)
-        completedTrackers.append(newTrackerRecord)
     }
     
-    func fetchRecords(for tracker: TrackerCoreData) -> [TrackerRecordCoreData] {
+    func fetchRecords(for tracker: TrackerCoreData) -> [TrackerRecord] {
         let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "tracker == %@", tracker)
         do {
-            return try context.fetch(request)
+            let records = try context.fetch(request)
+            return records.map { TrackerRecord(coreData: $0) }
         } catch {
             print("Failed to fetch records: \(error)")
             return []
         }
     }
     
-    func deleteRecord(_ record: TrackerRecordCoreData) {
-        context.delete(record)
-        saveContext()
-        
-        if let index = completedTrackers.firstIndex(where: { $0.trackerID == record.tracker?.id }) {
-            completedTrackers.remove(at: index)
+    func deleteRecord(_ record: TrackerRecord) {
+        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "tracker.id == %@ AND date == %@", record.trackerID as CVarArg, record.date)
+        do {
+            if let recordObject = try context.fetch(request).first {
+                context.delete(recordObject)
+                saveContext()
+            }
+        } catch {
+            print("Failed to delete record: \(error)")
         }
     }
+    
+//    func fetchRecords(for tracker: TrackerCoreData) -> [TrackerRecordCoreData] {
+//        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+//        request.predicate = NSPredicate(format: "tracker == %@", tracker)
+//        do {
+//            return try context.fetch(request)
+//        } catch {
+//            print("Failed to fetch records: \(error)")
+//            return []
+//        }
+//    }
+    
+//    func deleteRecord(_ record: TrackerRecordCoreData) {
+//        context.delete(record)
+//        saveContext()
+//        
+//        if let index = completedTrackers.firstIndex(where: { $0.trackerID == record.tracker?.id }) {
+//            completedTrackers.remove(at: index)
+//        }
+//    }
     
     //MARK: - Private Methods
     

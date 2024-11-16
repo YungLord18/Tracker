@@ -21,38 +21,50 @@ final class TrackerStore {
     
     //MARK: - Public Methods
     
-    func addTracker(
-        id: UUID,
-        name: String,
-        color: UIColor,
-        emoji: String,
-        schedule: [String],
-        category: TrackerCategoryCoreData) {
-            let trackerObject = TrackerCoreData(context: context)
-            trackerObject.id = id
-            trackerObject.name = name
-            trackerObject.color = color
-            trackerObject.emoji = emoji
-            if let jsonData = try? JSONEncoder().encode(schedule) {
-                trackerObject.schedule = String(data: jsonData, encoding: .utf8)
-            } else {
-                print("Failed to encode schedule to JSON.")
-            }
-            trackerObject.category = category
-            saveContext()
+    func addTracker(_ tracker: Tracker, category: TrackerCategory
+                    //        id: UUID,
+                    //        name: String,
+                    //        color: UIColor,
+                    //        emoji: String,
+                    //        schedule: [String],
+                    //        category: TrackerCategoryCoreData
+    ) {
+        let trackerObject = TrackerCoreData(context: context)
+        trackerObject.id = tracker.id
+        trackerObject.name = tracker.name
+        trackerObject.color = tracker.color
+        trackerObject.emoji = tracker.emoji
+        if let jsonData = try? JSONEncoder().encode(tracker.schedule) {
+            trackerObject.schedule = String(data: jsonData, encoding: .utf8)
+        } else {
+            print("Failed to encode schedule to JSON.")
         }
+        let categoryObject = TrackerCategoryCoreData(context: context)
+        categoryObject.title = category.title
+        trackerObject.category = categoryObject
+        saveContext()
+    }
     
-    func fetchAllTrackers() -> [TrackerCoreData] {
+    func fetchAllTrackers() -> [Tracker] {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         do {
             let trackers = try context.fetch(request)
-            trackers.forEach { tracker in
-                if let scheduleData = tracker.schedule?.data(using: .utf8),
-                   let scheduleArray = try? JSONDecoder().decode([String].self, from: scheduleData) {
-                    print("Schedule for \(String(describing: tracker.name)): \(scheduleArray)")
+            return trackers.compactMap { tracker in
+                if let id = tracker.id,
+                   let name = tracker.name,
+                   let color = tracker.color as? UIColor,
+                   let emoji = tracker.emoji {
+                    return Tracker(
+                        id: id,
+                        name: name,
+                        color: color,
+                        emoji: emoji,
+                        schedule: tracker.schedule?.data(using:.utf8).flatMap { try? JSONDecoder().decode([String].self, from: $0) } ?? []
+                    )
+                } else {
+                    return nil
                 }
             }
-            return trackers
         } catch {
             print("Failed to fetch trackers: \(error)")
             return []

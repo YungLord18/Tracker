@@ -1,7 +1,7 @@
 import CoreData
 import UIKit
 
-// MARK: - ExtensionTrackerDataManager
+// MARK: - ExtensionTrackerDataManagerStore
 
 extension TrackerDataManager {
     func shouldDisplayTracker(_ tracker: Tracker, forDate date: Date, dateFormatter: DateFormatter) -> Bool {
@@ -66,7 +66,7 @@ extension TrackerDataManager {
                     let tracker = Tracker(
                         id: trackerCoreData.id ?? UUID(),
                         name: trackerCoreData.name ?? "",
-                        color: trackerCoreData.color as! UIColor,
+                        color: trackerCoreData.color as? UIColor ?? UIColor.black,
                         emoji: trackerCoreData.emoji ?? "",
                         schedule: decodeSchedule(trackerCoreData.schedule))
                     if pinnedTrackerIds.contains(tracker.id) {
@@ -96,7 +96,7 @@ extension TrackerDataManager {
                         Tracker(
                             id: trackerCoreData.id ?? UUID(),
                             name: trackerCoreData.name ?? "",
-                            color: trackerCoreData.color as! UIColor,
+                            color: trackerCoreData.color as? UIColor ?? UIColor.black,
                             emoji: trackerCoreData.emoji ?? "",
                             schedule: decodeSchedule(trackerCoreData.schedule))
                     })

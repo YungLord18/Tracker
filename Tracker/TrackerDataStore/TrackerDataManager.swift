@@ -24,9 +24,12 @@ final class TrackerDataManager {
     // MARK: - Initialization
     
     private init() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        self.context = appDelegate.persistentContainer.viewContext
-        loadCompletedTrackers()
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+            self.context = appDelegate.persistentContainer.viewContext
+            loadCompletedTrackers()
+        } else {
+            fatalError("Failed to get app delegate")
+        }
     }
     
     init(context: NSManagedObjectContext) {
