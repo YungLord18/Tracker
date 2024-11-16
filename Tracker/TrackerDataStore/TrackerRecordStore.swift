@@ -10,12 +10,24 @@ struct TrackerRecord {
 
 //MARK: - Final Class TrackerRecordStore
 
-final class TrackerRecordStore {
+final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     
     //MARK: - Private Properties
     
-    private let context = TrackerDataManager.shared.context
+    private var context = TrackerDataManager.shared.context
     private var completedTrackers: [TrackerRecord] = []
+    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>?
+    private let coreData: TrackerDataManager
+    
+    // MARK: - Initialization
+    
+    init(coreData: TrackerDataManager = TrackerDataManager.shared,
+         managedObjectContext: NSManagedObjectContext = TrackerDataManager.shared.persistentContainer.viewContext) {
+        self.coreData = coreData
+        self.context = managedObjectContext
+        super.init()
+        setupFetchedResultsController()
+    }
     
     //MARK: - Public Methods
     
@@ -92,6 +104,26 @@ final class TrackerRecordStore {
             }
         } catch {
             print("Failed to save context: \(error.localizedDescription)")
+        }
+    }
+    
+    private func setupFetchedResultsController() {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
+        
+        fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        
+        fetchedResultsController?.delegate = self
+        
+        do {
+            try fetchedResultsController?.performFetch()
+        } catch {
+            print("Ошибка performFetch: \(error)")
         }
     }
 }

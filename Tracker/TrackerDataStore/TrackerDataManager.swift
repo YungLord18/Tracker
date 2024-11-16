@@ -16,6 +16,10 @@ final class TrackerDataManager {
     var categories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
     
+    public var persistentContainer: NSPersistentContainer {
+            return (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer ?? NSPersistentContainer(name: "Tracker")
+        }
+    
     // MARK: - Private Properties
     
     private(set) var previousCategories: [UUID: TrackerCategoryCoreData] = [:]
