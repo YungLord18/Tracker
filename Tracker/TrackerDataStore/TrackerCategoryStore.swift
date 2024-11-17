@@ -29,13 +29,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     
     //MARK: - Public Methods
     
-//    func addCategory(title: String, trackers: [TrackerCoreData]) {
-//        let categoryObject = TrackerCategoryCoreData(context: context)
-//        categoryObject.title = title
-//        categoryObject.addToTrackers(NSSet(array: trackers))
-//        saveContext()
-//    }
-    
     func addCategory(_ category: TrackerCategory) {
         let categoryObject = TrackerCategoryCoreData(context: context)
         categoryObject.title = category.title
@@ -69,29 +62,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         }
         return categories
     }
-   
-//    func getCategory() throws -> [TrackerCategory] {
-//        var categories: [TrackerCategory] = []
-//        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-//        do {
-//            let authors = try context.fetch(request)
-//            authors.forEach {
-//                if let title = $0.title {
-//                    categories.append(TrackerCategory(title: title, trackers: []))
-//                } else {
-//                    print("Warning: TrackerCategoryCoreData object with nil title found.")
-//                }
-//            }
-//        } catch {
-//            throw error
-//        }
-//        return categories
-//    }
-    
-    func deleteCategory(_ category: TrackerCategoryCoreData) {
-        context.delete(category)
-        saveContext()
-    }
     
     //MARK: - Private Methods
     
@@ -122,5 +92,10 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         } catch {
             print("Ошибка performFetch: \(error)")
         }
+    }
+    
+    private func deleteCategory(_ category: TrackerCategoryCoreData) {
+        context.delete(category)
+        saveContext()
     }
 }

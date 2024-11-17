@@ -33,14 +33,7 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     
     //MARK: - Public Methods
     
-    func addTracker(_ tracker: Tracker, category: TrackerCategory
-                    //        id: UUID,
-                    //        name: String,
-                    //        color: UIColor,
-                    //        emoji: String,
-                    //        schedule: [String],
-                    //        category: TrackerCategoryCoreData
-    ) {
+    func addTracker(_ tracker: Tracker, category: TrackerCategory) {
         let trackerObject = TrackerCoreData(context: context)
         trackerObject.id = tracker.id
         trackerObject.name = tracker.name
@@ -83,11 +76,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    func deleteTracker(_ tracker: TrackerCoreData) {
-        context.delete(tracker)
-        saveContext()
-    }
-    
     // MARK: - Private Methods
     
     private func saveContext() {
@@ -117,5 +105,10 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         } catch {
             print("Ошибка performFetch: \(error)")
         }
+    }
+    
+    private func deleteTracker(_ tracker: TrackerCoreData) {
+        context.delete(tracker)
+        saveContext()
     }
 }
