@@ -562,9 +562,23 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
                 color: selectedColor,
                 emoji: selectedEmoji,
                 schedule: schedule)
-            trackerStore.addNewTracker(to: selectedCategory, tracker: newTracker)
+            trackerStore.addTracker(newTracker, category: TrackerCategory(title: selectedCategory, trackers: []))
             delegate?.didCreateTracker(newTracker, inCategory: selectedCategory)
         }
         dismiss(animated: true, completion: nil)
     }
+}
+
+//MARK: - Tracker Store Delegate
+
+extension TrackerCreationViewController: TrackerStoreDelegate {
+    
+    func trackerStore(_ trackerStore: TrackerStore, didLoadCategories categories: [TrackerCategory]) {
+        self.selectedCategory = categories.first?.title
+        self.updateCategoriesButtonTitle()
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore, didLoadTrackers trackers: [Tracker]) {}
+    
+    func trackerStore(_ trackerStore: TrackerStore, didLoadCompletedTrackers completedTrackers: [TrackerRecord]) {}
 }
