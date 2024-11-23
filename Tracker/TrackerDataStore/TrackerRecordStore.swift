@@ -82,8 +82,6 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    //MARK: - делаем перенос файлов из extension
-    
     func loadCompletedTrackers() {
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         do {
@@ -216,9 +214,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     func isHabit(tracker: TrackerCoreData) -> Bool {
         return tracker.schedule?.contains("habit") ?? false
     }
-    
-    //MARK: - делаем перенос файлов из TrackerDataManager
-    
+
     func markTrackerAsCompleted(trackerId: UUID, date: String) {
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(

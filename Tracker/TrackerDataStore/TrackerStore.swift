@@ -188,7 +188,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Failed to update tracker: \(error)")
         }
     }
-    //MARK: - Делаем перенос файлов из extension
     
     func shouldDisplayTracker(_ tracker: Tracker, forDate date: Date, dateFormatter: DateFormatter) -> Bool {
         let calendar = Calendar.current
@@ -240,8 +239,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         }
         return false
     }
-    
-    //MARK: - делаем перенос файлов из TrackerDataManager
     
     func isIrregularEvent(tracker: TrackerCoreData) -> Bool {
         return tracker.schedule?.contains("irregularEvent") ?? false
@@ -343,9 +340,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         context.delete(tracker)
         saveContext()
     }
-    
-    
-    //MARK: - делаем перенос
     
     private func decodeSchedule(_ scheduleString: String?) -> [String] {
         guard let data = scheduleString?.data(using: .utf8) else { return [] }

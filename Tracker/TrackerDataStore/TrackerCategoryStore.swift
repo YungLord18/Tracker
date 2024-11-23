@@ -22,7 +22,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     //MARK: - Public Properties
     
     var categories: [TrackerCategory] = []
-    //let trackerCategoryStore = TrackerCategoryStore()
     var delegate: TrackerCategoryDelegate?
     
     @NSManaged public var isPinned: Bool
@@ -81,8 +80,6 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         }
         return categories
     }
-    
-    //MARK: - делаем перенос файлов из extension
     
     func loadCategories(for date: Date, dateFormatter: DateFormatter) {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
@@ -208,9 +205,7 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
             return nil
         }
     }
-    
-    //MARK: - делаем перенос файлов из TrackerDataManager
-    
+        
     func addNewTracker(to categoryTitle: String, tracker: Tracker) {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "title == %@", categoryTitle)
