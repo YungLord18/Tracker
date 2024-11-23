@@ -14,7 +14,7 @@ struct TrackerCategory {
     let title: String
     let trackers: [Tracker]
 }
-
+ 
 //MARK: - Final Class TrackerCategoryStore
 
 final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
@@ -22,7 +22,7 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     //MARK: - Public Properties
     
     var categories: [TrackerCategory] = []
-    let trackerCategoryStore = TrackerCategoryStore()
+    //let trackerCategoryStore = TrackerCategoryStore()
     var delegate: TrackerCategoryDelegate?
     
     @NSManaged public var isPinned: Bool
@@ -43,6 +43,7 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         self.coreData = TrackerDataManager.shared
         super.init()
         setupFetchedResultsController()
+        pinnedTrackers = []
     }
     
     //MARK: - Public Methods

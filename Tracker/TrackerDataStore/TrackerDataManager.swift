@@ -39,6 +39,7 @@ final class TrackerDataManager {
     init(context: NSManagedObjectContext) {
         self.context = context
     }
+
     
     // MARK: - Public Methods
     

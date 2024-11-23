@@ -47,6 +47,7 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         self.context = managedObjectContext
         super.init()
         setupFetchedResultsController()
+        pinnedTrackers = []
     }
     
     //MARK: - Public Methods
