@@ -184,26 +184,11 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         return false
     }
     
-    func isHabit(tracker: TrackerCoreData) -> Bool {
-        return tracker.schedule?.contains("habit") ?? false
-    }
-    
     func getCategoryForTracker(trackerId: UUID) -> String? {
         if let tracker = fetchTracker(by: trackerId) {
             return tracker.category?.title
         }
         return nil
-    }
-    
-    func fetchTracker(by id: UUID) -> TrackerCoreData? {
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-        do {
-            return try context.fetch(fetchRequest).first
-        } catch {
-            print("Failed to fetch tracker: \(error)")
-            return nil
-        }
     }
         
     func addNewTracker(to categoryTitle: String, tracker: Tracker) {
@@ -296,6 +281,21 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
         } catch {
             print("Ошибка performFetch: \(error)")
         }
+    }
+    
+    private func fetchTracker(by id: UUID) -> TrackerCoreData? {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        do {
+            return try context.fetch(fetchRequest).first
+        } catch {
+            print("Failed to fetch tracker: \(error)")
+            return nil
+        }
+    }
+    
+    private func isHabit(tracker: TrackerCoreData) -> Bool {
+        return tracker.schedule?.contains("habit") ?? false
     }
     
     private func deleteCategory(_ category: TrackerCategoryCoreData) {

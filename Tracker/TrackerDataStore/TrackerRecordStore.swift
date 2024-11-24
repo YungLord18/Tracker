@@ -124,17 +124,6 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    func fetchTracker(by id: UUID) -> TrackerCoreData? {
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-        do {
-            return try context.fetch(fetchRequest).first
-        } catch {
-            print("Failed to fetch tracker: \(error)")
-            return nil
-        }
-    }
-    
     func shouldDisplayTracker(_ tracker: Tracker, forDate date: Date, dateFormatter: DateFormatter) -> Bool {
         let calendar = Calendar.current
         if tracker.schedule.contains("irregularEvent") {
@@ -184,10 +173,6 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Ошибка при запросе данных: \(error)")
         }
         return false
-    }
-    
-    func isHabit(tracker: TrackerCoreData) -> Bool {
-        return tracker.schedule?.contains("habit") ?? false
     }
 
     func markTrackerAsCompleted(trackerId: UUID, date: String) {
@@ -299,6 +284,17 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
+    private func fetchTracker(by id: UUID) -> TrackerCoreData? {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        do {
+            return try context.fetch(fetchRequest).first
+        } catch {
+            print("Failed to fetch tracker: \(error)")
+            return nil
+        }
+    }
+    
     private func getCompletedTrackersCount() -> Int {
         loadCompletedTrackers()
         return completedTrackers.count
@@ -322,6 +318,10 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         } catch {
             print("Ошибка performFetch: \(error)")
         }
+    }
+    
+    private func isHabit(tracker: TrackerCoreData) -> Bool {
+        return tracker.schedule?.contains("habit") ?? false
     }
     
     private func decodeSchedule(_ scheduleString: String?) -> [String] {
