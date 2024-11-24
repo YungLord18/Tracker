@@ -51,6 +51,24 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
     }
     
     //MARK: - Public Methods
+    
+    func addTracker(_ tracker: Tracker, category: TrackerCategory) {
+        let trackerObject = TrackerCoreData(context: context)
+        trackerObject.id = tracker.id
+        trackerObject.name = tracker.name
+        trackerObject.color = tracker.color
+        trackerObject.emoji = tracker.emoji
+        if let jsonData = try? JSONEncoder().encode(tracker.schedule) {
+            trackerObject.schedule = String(data: jsonData, encoding: .utf8)
+        } else {
+            print("Failed to encode schedule to JSON.")
+        }
+        let categoryObject = TrackerCategoryCoreData(context: context)
+        categoryObject.title = category.title
+        trackerObject.category = categoryObject
+        saveContext()
+    }
+    
     func loadTrackers(for category: TrackerCategory) {
         let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "category.title == %@", category.title)
@@ -116,50 +134,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
             }
         } catch {
             print("Failed to fetch categories: \(error)")
-        }
-    }
-    
-    func addTracker(_ tracker: Tracker, category: TrackerCategory) {
-        let trackerObject = TrackerCoreData(context: context)
-        trackerObject.id = tracker.id
-        trackerObject.name = tracker.name
-        trackerObject.color = tracker.color
-        trackerObject.emoji = tracker.emoji
-        if let jsonData = try? JSONEncoder().encode(tracker.schedule) {
-            trackerObject.schedule = String(data: jsonData, encoding: .utf8)
-        } else {
-            print("Failed to encode schedule to JSON.")
-        }
-        let categoryObject = TrackerCategoryCoreData(context: context)
-        categoryObject.title = category.title
-        trackerObject.category = categoryObject
-        saveContext()
-    }
-    
-    func fetchAllTrackers() -> [Tracker] {
-        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        do {
-            let trackers = try context.fetch(request)
-            return trackers.compactMap { tracker in
-                if let id = tracker.id,
-                   let name = tracker.name,
-                   let color = tracker.color as? UIColor,
-                   let emoji = tracker.emoji {
-                    return Tracker(
-                        id: id,
-                        name: name,
-                        color: color,
-                        emoji: emoji,
-                        schedule: tracker.schedule?.data(using:.utf8).flatMap { try? JSONDecoder().decode([String].self,
-                                                                                                          from: $0) } ?? []
-                    )
-                } else {
-                    return nil
-                }
-            }
-        } catch {
-            print("Failed to fetch trackers: \(error)")
-            return []
         }
     }
     
@@ -238,10 +212,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Ошибка при запросе данных: \(error)")
         }
         return false
-    }
-    
-    func isIrregularEvent(tracker: TrackerCoreData) -> Bool {
-        return tracker.schedule?.contains("irregularEvent") ?? false
     }
     
     func isHabit(tracker: TrackerCoreData) -> Bool {
@@ -336,9 +306,40 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
+    private func fetchAllTrackers() -> [Tracker] {
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        do {
+            let trackers = try context.fetch(request)
+            return trackers.compactMap { tracker in
+                if let id = tracker.id,
+                   let name = tracker.name,
+                   let color = tracker.color as? UIColor,
+                   let emoji = tracker.emoji {
+                    return Tracker(
+                        id: id,
+                        name: name,
+                        color: color,
+                        emoji: emoji,
+                        schedule: tracker.schedule?.data(using:.utf8).flatMap { try? JSONDecoder().decode([String].self,
+                                                                                                          from: $0) } ?? []
+                    )
+                } else {
+                    return nil
+                }
+            }
+        } catch {
+            print("Failed to fetch trackers: \(error)")
+            return []
+        }
+    }
+    
     private func deleteTracker(_ tracker: TrackerCoreData) {
         context.delete(tracker)
         saveContext()
+    }
+    
+    private func isIrregularEvent(tracker: TrackerCoreData) -> Bool {
+        return tracker.schedule?.contains("irregularEvent") ?? false
     }
     
     private func decodeSchedule(_ scheduleString: String?) -> [String] {

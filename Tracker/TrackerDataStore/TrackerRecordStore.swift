@@ -32,9 +32,9 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     
     //MARK: - Private Properties
     
+    private let coreData: TrackerDataManager
     private var context = TrackerDataManager.shared.context
     private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>?
-    private let coreData: TrackerDataManager
     
     private(set) var pinnedTrackers: [TrackerCoreData] = []
     
@@ -49,6 +49,7 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     }
     
     //MARK: - Public Methods
+    
     func loadRecords(for tracker: Tracker) {
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "tracker.id == %@", tracker.id as CVarArg)
@@ -61,27 +62,6 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    func addRecord(_ record: TrackerRecord) {
-        let recordObject = TrackerRecordCoreData(context: context)
-        recordObject.date = record.date
-        recordObject.tracker = TrackerCoreData(context: context)
-        recordObject.tracker?.id = record.trackerID
-        saveContext()
-    }
-    
-    func deleteRecord(_ record: TrackerRecord) {
-        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        request.predicate = NSPredicate(format: "tracker.id == %@ AND date == %@", record.trackerID as CVarArg, record.date)
-        do {
-            if let recordObject = try context.fetch(request).first {
-                context.delete(recordObject)
-                saveContext()
-            }
-        } catch {
-            print("Failed to delete record: \(error)")
-        }
-    }
-    
     func loadCompletedTrackers() {
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         do {
@@ -90,11 +70,6 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
         } catch {
             print("Failed to fetch completed trackers: \(error)")
         }
-    }
-    
-    func getCompletedTrackersCount() -> Int {
-        loadCompletedTrackers()
-        return completedTrackers.count
     }
     
     func loadCategories(for date: Date, dateFormatter: DateFormatter) {
@@ -280,6 +255,27 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
     
     //MARK: - Private Methods
     
+    private func addRecord(_ record: TrackerRecord) {
+        let recordObject = TrackerRecordCoreData(context: context)
+        recordObject.date = record.date
+        recordObject.tracker = TrackerCoreData(context: context)
+        recordObject.tracker?.id = record.trackerID
+        saveContext()
+    }
+    
+    private func deleteRecord(_ record: TrackerRecord) {
+        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "tracker.id == %@ AND date == %@", record.trackerID as CVarArg, record.date)
+        do {
+            if let recordObject = try context.fetch(request).first {
+                context.delete(recordObject)
+                saveContext()
+            }
+        } catch {
+            print("Failed to delete record: \(error)")
+        }
+    }
+    
     private func saveContext() {
         do {
             if context.hasChanges {
@@ -301,6 +297,11 @@ final class TrackerRecordStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Failed to fetch records: \(error)")
             return []
         }
+    }
+    
+    private func getCompletedTrackersCount() -> Int {
+        loadCompletedTrackers()
+        return completedTrackers.count
     }
     
     private func setupFetchedResultsController() {

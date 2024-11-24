@@ -28,9 +28,9 @@ final class TrackerCategoryStore: NSObject, NSFetchedResultsControllerDelegate {
     
     //MARK: - Private Properties
     
+    private let coreData: TrackerDataManager
     private var context = TrackerDataManager.shared.context
     private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>?
-    private let coreData: TrackerDataManager
     private var completedTrackers: [TrackerRecord] = []
     
     private(set) var pinnedTrackers: [TrackerCoreData] = []
