@@ -81,14 +81,14 @@ final class TrackerCategoryViewController: UIViewController {
             errorImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             errorImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            addCategoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            addCategoryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50),
-            
             tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 38),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -20)
+            tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -20),
+            
+            addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            addCategoryButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            addCategoryButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50)
         ])
     }
     

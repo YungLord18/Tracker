@@ -93,7 +93,7 @@ extension TrackersViewController: TrackerCreationDelegate {
         _ tracker: Tracker,
         inCategory category: String
     ) {
-        dataManager.addNewTracker(to: category, tracker: tracker)
+        trackerCategoryStore.addNewTracker(to: category, tracker: tracker)
         updateTrackersView()
     }
 }
@@ -110,7 +110,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         numberOfItemsInSection section: Int) -> Int {
             let category = visibleCategories[section]
             let trackers = category.trackers.filter {
-                dataManager.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
+                trackerStore.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
             }
             return trackers.count
         }
@@ -125,10 +125,10 @@ extension TrackersViewController: UICollectionViewDataSource {
             }
             let category = visibleCategories[indexPath.section]
             let trackers = category.trackers.filter {
-                dataManager.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
+                trackerStore.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
             }
             let tracker = trackers[indexPath.item]
-            let completedTrackers = dataManager.completedTrackers.filter { $0.trackerID == tracker.id }
+            let completedTrackers = trackerRecordStore.completedTrackers.filter { $0.trackerID == tracker.id }
             cell.configure(
                 with: tracker,
                 completedTrackers: completedTrackers,

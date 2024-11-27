@@ -45,6 +45,7 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
     
     private var selectedDays: [WeekDay] = []
     private var dataManager = TrackerDataManager.shared
+    private let trackerStore = TrackerStore()
     private var recordDay = 0
     
     private lazy var titleLabel: UILabel = {
@@ -203,8 +204,11 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
         emojiCollectionView.register(EmojiCell.self, forCellWithReuseIdentifier: EmojiCell.reuseIdentifier)
         colorCollectionView.register(ColorCell.self, forCellWithReuseIdentifier: ColorCell.reuseIdentifier)
         
+        trackerStore.delegate = self
+        trackerStore.loadCategories(for: Date(), dateFormatter: DateFormatter())
+
         if let tracker = trackerToEdit,
-           let categoryTitle = TrackerDataManager.shared.getCategoryForTracker(trackerId: tracker.id) {
+           let categoryTitle = TrackerCategoryStore().getCategoryForTracker(trackerId: tracker.id) {
             setupForEditing(tracker: tracker, category: categoryTitle)
         }
     }
@@ -346,7 +350,9 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
     
     private func setupForEditing(tracker: Tracker, category: String) {
         titleLabel.text = "Введите название трекера"
-        let completedTrackers = dataManager.completedTrackers.filter { $0.trackerID == tracker.id }
+        let trackerRecordStore = TrackerRecordStore()
+        trackerRecordStore.loadRecords(for: tracker)
+        let completedTrackers = trackerRecordStore.completedTrackers
         let uniqueDates = Set(completedTrackers.map { $0.date })
         recordDay = uniqueDates.count
         nameTextField.text = tracker.name
@@ -547,7 +553,7 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
                 color: selectedColor,
                 emoji: selectedEmoji,
                 schedule: schedule)
-            dataManager.updateTracker(updatedTracker, inCategory: selectedCategory)
+            trackerStore.updateTracker(updatedTracker, inCategory: selectedCategory)
             delegate?.didCreateTracker(updatedTracker, inCategory: selectedCategory)
         } else {
             let newTracker = Tracker(
@@ -556,9 +562,23 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
                 color: selectedColor,
                 emoji: selectedEmoji,
                 schedule: schedule)
-            dataManager.addNewTracker(to: selectedCategory, tracker: newTracker)
+            trackerStore.addTracker(newTracker, category: TrackerCategory(title: selectedCategory, trackers: []))
             delegate?.didCreateTracker(newTracker, inCategory: selectedCategory)
         }
         dismiss(animated: true, completion: nil)
     }
+}
+
+//MARK: - Tracker Store Delegate
+
+extension TrackerCreationViewController: TrackerStoreDelegate {
+    
+    func trackerStore(_ trackerStore: TrackerStore, didLoadCategories categories: [TrackerCategory]) {
+        self.selectedCategory = categories.first?.title
+        self.updateCategoriesButtonTitle()
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore, didLoadTrackers trackers: [Tracker]) {}
+    
+    func trackerStore(_ trackerStore: TrackerStore, didLoadCompletedTrackers completedTrackers: [TrackerRecord]) {}
 }
