@@ -329,11 +329,6 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
     
-    private func deleteTracker(_ tracker: TrackerCoreData) {
-        context.delete(tracker)
-        saveContext()
-    }
-    
     private func isIrregularEvent(tracker: TrackerCoreData) -> Bool {
         return tracker.schedule?.contains("irregularEvent") ?? false
     }
@@ -351,5 +346,10 @@ final class TrackerStore: NSObject, NSFetchedResultsControllerDelegate {
             print("Failed to decode schedule: \(error)")
             return []
         }
+    }
+    
+    private func deleteTracker(_ tracker: TrackerCoreData) {
+        context.delete(tracker)
+        saveContext()
     }
 }

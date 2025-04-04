@@ -1,19 +1,21 @@
 import UIKit
 
-final class TrackersViewController: UIViewController, TrackerRecordDelegate, TrackerCategoryDelegate, TrackerStoreDelegate {
+final class TrackersViewController: UIViewController, TrackerCategoryDelegate, TrackerStoreDelegate {
 
     // MARK: - Public Properties
     
     var trackerStore = TrackerStore()
     var trackerRecordStore = TrackerRecordStore()
     var trackerCategoryStore = TrackerCategoryStore()
-    var categories: [TrackerCategory] = []
-    var completedTrackers: [TrackerRecord] = []
-    var trackers: [Tracker] = []
-    var records: [TrackerRecord] = []
+    
+//    var categories: [TrackerCategory] = []
+//    var completedTrackers: [TrackerRecord] = []
+//    var trackers: [Tracker] = []
+    //var records: [TrackerRecord] = []
     
     var currentDate: Date = Date()
     let dataManager = TrackerDataManager.shared
+    
     let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yy"
@@ -121,20 +123,20 @@ final class TrackersViewController: UIViewController, TrackerRecordDelegate, Tra
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        
         trackerStore.delegate = self
-        trackerRecordStore.delegate = self
         trackerCategoryStore.delegate = self
-        trackerStore.loadCategories(for: Date(), dateFormatter: dateFormatter)
-        trackerRecordStore.loadCompletedTrackers()
+        searchBar.delegate = self
+        //trackerStore.loadCategories(for: Date(), dateFormatter: dateFormatter)
         trackerCategoryStore.loadCategories(for: Date(), dateFormatter: dateFormatter)
+        trackerRecordStore.loadCompletedTrackers()
         
         setupUI()
         setupConstraints()
         setupNavigationBar()
-        updateTrackersView()
         visibleCategories = trackerCategoryStore.categories
-        searchBar.delegate = self
-        
+        updateTrackersView()
+
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
     }
@@ -148,46 +150,6 @@ final class TrackersViewController: UIViewController, TrackerRecordDelegate, Tra
     }
     
     //MARK: - Public Methods
-    
-    func trackerRecordStore(_ trackerRecordStore: TrackerRecordStore,
-                            didLoadCompletedTrackers completedTrackers: [TrackerRecord]) {
-        self.completedTrackers = completedTrackers
-        updateTrackersView()
-    }
-    
-    func trackerRecordStore(_ trackerRecordStore: TrackerRecordStore,
-                            didLoadRecords records: [TrackerRecord]) {
-        self.records = records
-        updateTrackersView()
-    }
-    
-    func trackerCategoryStore(_ trackerCategoryStore: TrackerCategoryStore,
-                              didLoadCategories categories: [TrackerCategory]) {
-        if !categories.isEmpty {
-            self.categories = categories
-            updateTrackersView()
-        }
-    }
-    
-    func trackerStore(_ trackerStore: TrackerStore,
-                      didLoadCategories categories: [TrackerCategory]) {
-        if !categories.isEmpty {
-            self.categories = categories
-            updateTrackersView()
-        }
-    }
-    
-    func trackerStore(_ trackerStore: TrackerStore,
-                      didLoadTrackers trackers: [Tracker]) {
-        self.trackers = trackers
-        updateTrackersView()
-    }
-    
-    func trackerStore(_ trackerStore: TrackerStore,
-                      didLoadCompletedTrackers completedTrackers: [TrackerRecord]) {
-        self.completedTrackers = completedTrackers
-        updateTrackersView()
-    }
     
     func updateTrackersView() {
         if !trackerCategoryStore.categories.isEmpty {
@@ -212,6 +174,34 @@ final class TrackersViewController: UIViewController, TrackerRecordDelegate, Tra
         }
     }
     
+    func trackerCategoryStore(_ trackerCategoryStore: TrackerCategoryStore,
+                              didLoadCategories categories: [TrackerCategory]) {
+        if !categories.isEmpty {
+            //self.categories = categories
+            updateTrackersView()
+        }
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore,
+                      didLoadCategories categories: [TrackerCategory]) {
+        if !categories.isEmpty {
+            //self.categories = categories
+            updateTrackersView()
+        }
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore,
+                      didLoadTrackers trackers: [Tracker]) {
+        //self.trackers = trackers
+        updateTrackersView()
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore,
+                      didLoadCompletedTrackers completedTrackers: [TrackerRecord]) {
+       // self.completedTrackers = completedTrackers
+        updateTrackersView()
+    }
+
     func filterTrackersSearchBar(by searchText: String, from categories: [TrackerCategory]) -> [TrackerCategory] {
         return categories.map { category in
             let filteredTrackers = category.trackers.filter { tracker in

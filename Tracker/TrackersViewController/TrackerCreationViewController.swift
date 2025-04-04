@@ -98,7 +98,7 @@ final class TrackerCreationViewController: UIViewController, UITextFieldDelegate
         let button = createRoundedButton(
             title: "Расписание",
             action: #selector(scheduleButtonTapped),
-            corners: [.topLeft, .topRight],
+            corners: [.allCorners],
             radius: 16)
         button.titleLabel?.numberOfLines = 0
         button.titleLabel?.textAlignment = .left
