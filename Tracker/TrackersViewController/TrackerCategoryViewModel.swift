@@ -32,7 +32,7 @@ final class TrackerCategoryViewModel {
     
     func addCategory(with title: String) {
         let newCategory = TrackerCategory(title: title, trackers: [])
-        trackerCategoryStore.addCategory(title: title, trackers: [])
+        trackerCategoryStore.addCategory(newCategory)
         categories.append(newCategory)
         selectedCategory = newCategory
     }

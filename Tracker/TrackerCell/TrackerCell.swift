@@ -19,6 +19,8 @@ final class TrackerCell: UICollectionViewCell {
     //MARK: - Public Properties
     
     weak var delegate: TrackerCellDelegate?
+    let trackerStore = TrackerStore()
+    let trackerRecordStore = TrackerRecordStore()
     
     //MARK: - Private Properties
     
@@ -241,7 +243,7 @@ final class TrackerCell: UICollectionViewCell {
     
     private func isTrackerPinned() -> Bool {
         guard let tracker = tracker else { return false }
-        return dataManager?.isTrackerPinned(tracker) ?? false
+        return trackerStore.isTrackerPinned(tracker)
     }
     
     //MARK: - Actions
@@ -254,9 +256,9 @@ final class TrackerCell: UICollectionViewCell {
             return
         }
         if isCompletedForToday() {
-            dataManager?.unmarkTrackerAsCompleted(trackerId: tracker.id, date: date)
+            trackerRecordStore.unmarkTrackerAsCompleted(trackerId: tracker.id, date: date)
         } else {
-            dataManager?.markTrackerAsCompleted(trackerId: tracker.id, date: date)
+            trackerRecordStore.markTrackerAsCompleted(trackerId: tracker.id, date: date)
             let trackerRecord = TrackerRecord(trackerID: tracker.id, date: date)
                     addCompletedTracker(trackerRecord)
         }
@@ -276,16 +278,16 @@ extension TrackerCell: UIContextMenuInteractionDelegate {
         _ interaction: UIContextMenuInteraction,
         configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
             guard let tracker = tracker else { return nil }
-            let isPinned = dataManager?.isTrackerPinned(tracker) ?? false
+            let isPinned = trackerStore.isTrackerPinned(tracker)
             let pinActionTitle = isPinned ?
             NSLocalizedString("Открепить", comment: "") :
             NSLocalizedString("Закрепить", comment: "")
             let pinAction = UIAction(title: pinActionTitle, image: UIImage(systemName: "pin")) { [weak self] _ in
                 guard let self = self else { return }
                 if isPinned {
-                    self.dataManager?.unpinTracker(tracker)
+                    self.trackerStore.unpinTracker(tracker)
                 } else {
-                    self.dataManager?.pinTracker(tracker)
+                    self.trackerStore.pinTracker(tracker)
                 }
                 self.delegate?.trackerCellDidToggleCompletion(self, for: tracker)
             }

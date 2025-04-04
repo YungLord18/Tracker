@@ -1,8 +1,16 @@
 import UIKit
 
-final class TrackersViewController: UIViewController {
-    
+final class TrackersViewController: UIViewController, TrackerRecordDelegate, TrackerCategoryDelegate, TrackerStoreDelegate {
+
     // MARK: - Public Properties
+    
+    var trackerStore = TrackerStore()
+    var trackerRecordStore = TrackerRecordStore()
+    var trackerCategoryStore = TrackerCategoryStore()
+    var categories: [TrackerCategory] = []
+    var completedTrackers: [TrackerRecord] = []
+    var trackers: [Tracker] = []
+    var records: [TrackerRecord] = []
     
     var currentDate: Date = Date()
     let dataManager = TrackerDataManager.shared
@@ -11,9 +19,6 @@ final class TrackersViewController: UIViewController {
         formatter.dateFormat = "dd.MM.yy"
         return formatter
     }()
-    
-    var categories: [TrackerCategory] = []
-    var completedTrackers: [TrackerRecord] = []
     
     // MARK: - Private Properties
     
@@ -116,11 +121,18 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .ypWhite
+        trackerStore.delegate = self
+        trackerRecordStore.delegate = self
+        trackerCategoryStore.delegate = self
+        trackerStore.loadCategories(for: Date(), dateFormatter: dateFormatter)
+        trackerRecordStore.loadCompletedTrackers()
+        trackerCategoryStore.loadCategories(for: Date(), dateFormatter: dateFormatter)
+        
         setupUI()
         setupConstraints()
         setupNavigationBar()
         updateTrackersView()
-        visibleCategories = dataManager.categories
+        visibleCategories = trackerCategoryStore.categories
         searchBar.delegate = self
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -137,26 +149,67 @@ final class TrackersViewController: UIViewController {
     
     //MARK: - Public Methods
     
+    func trackerRecordStore(_ trackerRecordStore: TrackerRecordStore,
+                            didLoadCompletedTrackers completedTrackers: [TrackerRecord]) {
+        self.completedTrackers = completedTrackers
+        updateTrackersView()
+    }
+    
+    func trackerRecordStore(_ trackerRecordStore: TrackerRecordStore,
+                            didLoadRecords records: [TrackerRecord]) {
+        self.records = records
+        updateTrackersView()
+    }
+    
+    func trackerCategoryStore(_ trackerCategoryStore: TrackerCategoryStore,
+                              didLoadCategories categories: [TrackerCategory]) {
+        if !categories.isEmpty {
+            self.categories = categories
+            updateTrackersView()
+        }
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore,
+                      didLoadCategories categories: [TrackerCategory]) {
+        if !categories.isEmpty {
+            self.categories = categories
+            updateTrackersView()
+        }
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore,
+                      didLoadTrackers trackers: [Tracker]) {
+        self.trackers = trackers
+        updateTrackersView()
+    }
+    
+    func trackerStore(_ trackerStore: TrackerStore,
+                      didLoadCompletedTrackers completedTrackers: [TrackerRecord]) {
+        self.completedTrackers = completedTrackers
+        updateTrackersView()
+    }
+    
     func updateTrackersView() {
-        dataManager.loadCategories(for: currentDate, dateFormatter: dateFormatter)
-        let trackers = dataManager.categories.flatMap { $0.trackers }
-        _ = trackers.filter {
-            dataManager.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
+        if !trackerCategoryStore.categories.isEmpty {
+            let trackers = trackerStore.trackers
+            _ = trackers.filter {
+                trackerStore.shouldDisplayTracker($0, forDate: currentDate, dateFormatter: dateFormatter)
+            }
+            if let searchText = searchBar.text,!searchText.isEmpty {
+                visibleCategories = filterTrackersSearchBar(by: searchText, from: trackerCategoryStore.categories)
+            } else {
+                visibleCategories = trackerCategoryStore.categories
+            }
+            let hasTrackers = !visibleCategories.flatMap { $0.trackers }.isEmpty
+            let isSearchActive = searchBar.text?.isEmpty == false
+            errorImageView.isHidden = hasTrackers || isSearchActive
+            trackingLabel.isHidden = hasTrackers || isSearchActive
+            errorFilterImageView.isHidden = hasTrackers || !isSearchActive
+            filterLabel.isHidden = hasTrackers || !isSearchActive
+            filtersButton.isHidden = !hasTrackers
+            collectionView.isHidden = !hasTrackers
+            collectionView.reloadData()
         }
-        if let searchText = searchBar.text, !searchText.isEmpty {
-            visibleCategories = filterTrackersSearchBar(by: searchText, from: dataManager.categories)
-        } else {
-            visibleCategories = dataManager.categories
-        }
-        let hasTrackers = !visibleCategories.flatMap { $0.trackers }.isEmpty
-        let isSearchActive = searchBar.text?.isEmpty == false
-        errorImageView.isHidden = hasTrackers || isSearchActive
-        trackingLabel.isHidden = hasTrackers || isSearchActive
-        errorFilterImageView.isHidden = hasTrackers || !isSearchActive
-        filterLabel.isHidden = hasTrackers || !isSearchActive
-        filtersButton.isHidden = !hasTrackers
-        collectionView.isHidden = !hasTrackers
-        collectionView.reloadData()
     }
     
     func filterTrackersSearchBar(by searchText: String, from categories: [TrackerCategory]) -> [TrackerCategory] {
@@ -169,9 +222,8 @@ final class TrackersViewController: UIViewController {
     }
     
     func filterTrackers(to categories: [TrackerCategory]) {
-        dataManager.loadCategories(for: currentDate, dateFormatter: dateFormatter)
         visibleCategories = categories
-        let allTrackers = dataManager.categories.flatMap { $0.trackers }
+        let allTrackers = trackerCategoryStore.categories.flatMap { $0.trackers }
         let hasCreatedTrackers = !allTrackers.isEmpty
         let hasTrackers = !visibleCategories.flatMap { $0.trackers }.isEmpty
         errorFilterImageView.isHidden = hasTrackers || !hasCreatedTrackers
@@ -200,7 +252,7 @@ final class TrackersViewController: UIViewController {
             guard let self = self else { return }
             let currentDate = self.currentDate
             let dateFormatter = self.dateFormatter
-            self.dataManager.deleteTracker(withId: tracker.id, for: currentDate, dateFormatter: dateFormatter)
+            self.trackerRecordStore.deleteTracker(withId: tracker.id, for: currentDate, dateFormatter: dateFormatter)
             self.updateTrackersView()
         }
         let cancelAction = UIAlertAction(

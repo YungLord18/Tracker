@@ -4,6 +4,8 @@ import UIKit
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     
+    //MARK: - NSPersistentContainer
+    
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Tracker")
         container.loadPersistentStores { (storeDescription, error) in
